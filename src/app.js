@@ -1,55 +1,3 @@
-// const express = require('express');
-// const mediaRoutes = require('./routes/mediaRoutes');
-
-// const app = express();
-
-// // Middleware
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-
-// // CORS (if needed)
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-//   res.header('Access-Control-Allow-Headers', 'Content-Type');
-//   next();
-// });
-
-// // Health check endpoint
-// app.get('/health', (req, res) => {
-//   res.json({ 
-//     status: 'OK', 
-//     message: 'Server is running',
-//     timestamp: new Date().toISOString()
-//   });
-// });
-
-// // API Routes
-// app.use('/api/media', mediaRoutes);
-
-// // 404 handler
-// app.use((req, res) => {
-//   res.status(404).json({
-//     success: false,
-//     error: 'Route not found'
-//   });
-// });
-
-// // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error('Error:', err.stack);
-//   res.status(err.status || 500).json({
-//     success: false,
-//     error: err.message || 'Internal server error'
-//   });
-// });
-
-// module.exports = app;
-
-
-
-
-
 // app.js
 const express = require('express');
 const dotenv = require('dotenv');
@@ -64,12 +12,12 @@ connectDB();
 
 const app = express();
 
-// Middleware
+// ==================== Middleware ====================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Custom CORS (if you want fine control)
+// Optional: Custom CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -77,7 +25,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🩺 Health check endpoint
+// ==================== Health Check ====================
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
@@ -86,26 +34,25 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ✅ Import all routes
+// ==================== Import Routes ====================
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
-// (optional future additions)
 const photoVerificationRoutes = require('./routes/photoVerificationRoutes');
-app.use('/api/verify', photoVerificationRoutes);
-// const pointsTransactionRoutes = require('./routes/pointsTransactionRoutes');
-// const achievementRoutes = require('./routes/achievementRoutes');
-const photoRoutes = require('./routes/photoVerificationRoutes');
-app.use('/api/verify', photoRoutes);
+const itemRoutes = require('./routes/itemRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
-
-
-// ✅ Use API routes
+// ==================== Use Routes ====================
 app.use('/api/media', mediaRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/verify', photoVerificationRoutes);
 
-// 404 handler (for invalid routes)
+// Marketplace MVP routes
+app.use('/api/items', itemRoutes);
+app.use('/api/orders', orderRoutes);
+
+// ==================== 404 Handler ====================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -113,7 +60,7 @@ app.use((req, res) => {
   });
 });
 
-// Global error handler
+// ==================== Global Error Handler ====================
 app.use((err, req, res, next) => {
   console.error('🔥 Server Error:', err.stack);
   res.status(err.status || 500).json({

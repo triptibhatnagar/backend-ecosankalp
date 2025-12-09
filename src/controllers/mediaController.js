@@ -7,25 +7,20 @@ const path = require('path');
 const NEARBY_RADIUS_METERS = parseInt(process.env.NEARBY_RADIUS_METERS) || 5;
 const UPLOAD_DIR = './uploads';
 
-/**
- * Upload new media with GPS data
- */
 exports.uploadMedia = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ 
         success: false,
-        error: 'No file uploaded' 
+        error: 'No file uploaded'
       });
     }
 
     console.log('Processing file:', req.file.originalname);
 
-    // Extract GPS data from uploaded file
     const gpsData = await extractGPSData(req.file.path);
     console.log('GPS data extracted:', gpsData);
 
-    // Create media document
     const media = new Media({
       filename: req.file.filename,
       originalName: req.file.originalname,
@@ -48,7 +43,6 @@ exports.uploadMedia = async (req, res) => {
     await media.save();
     console.log('Media saved to database:', media._id);
 
-    // Find nearby captures
     const nearbyCaptures = await findNearbyCaptures(
       gpsData.latitude,
       gpsData.longitude,
@@ -99,7 +93,6 @@ exports.uploadMedia = async (req, res) => {
   } catch (error) {
     console.error('Upload error:', error);
     
-    // Clean up uploaded file on error
     if (req.file) {
       await fs.unlink(req.file.path).catch(err => {
         console.error('Error deleting file:', err);
@@ -113,9 +106,7 @@ exports.uploadMedia = async (req, res) => {
   }
 };
 
-/**
- * Get all media with pagination
- */
+
 exports.getAllMedia = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -148,9 +139,7 @@ exports.getAllMedia = async (req, res) => {
   }
 };
 
-/**
- * Get media by ID
- */
+
 exports.getMediaById = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
@@ -173,11 +162,9 @@ exports.getMediaById = async (req, res) => {
       error: error.message 
     });
   }
+  
 };
 
-/**
- * Find nearby media for a specific location
- */
 exports.getNearbyMedia = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
@@ -228,9 +215,7 @@ exports.getNearbyMedia = async (req, res) => {
   }
 };
 
-/**
- * Delete media
- */
+
 exports.deleteMedia = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
@@ -242,12 +227,10 @@ exports.deleteMedia = async (req, res) => {
       });
     }
 
-    // Delete file from filesystem
     await fs.unlink(path.join(UPLOAD_DIR, media.filename)).catch(err => {
       console.error('Error deleting file from disk:', err);
     });
     
-    // Delete from database
     await Media.findByIdAndDelete(req.params.id);
 
     res.json({ 

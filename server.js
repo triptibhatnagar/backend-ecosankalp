@@ -411,10 +411,15 @@ async function startServer() {
     console.log('✓ Uploads directory ready');
 
     const userRoutes = require('./src/routes/userRoutes');
-    const taskRoutes = require('./src/routes/taskRoutes');
-
+    const taskRoutes = require('./src/routes/taskRoutes');    
+    const itemRoutes = require('./src/routes/itemRoutes');
+    const orderRoutes = require('./src/routes/orderRoutes');
+    
     app.use('/api/users', userRoutes);
     app.use('/api/tasks', taskRoutes);
+    app.use('/api/items', itemRoutes);
+    app.use('/api/orders', orderRoutes);
+
 
 
     // Start server
